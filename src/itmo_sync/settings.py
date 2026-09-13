@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     )
 
     description_template: str = Field(
-        default="Преподаватель: {teacher}\n{format}\n{note}",
+        default="Преподаватель: {teacher}\n\n{note}",
         description="Шаблон подробного описания события (поддерживает многострочный текст)",
     )
 
@@ -125,7 +125,7 @@ class Settings(BaseSettings):
         yaml_file_encoding="utf-8",
         env_file=".env",
         env_file_encoding="utf-8",
-        env_prefix="ITMOSCHEDULE_",
+        env_prefix="ITMO_SYNC_",
         env_nested_delimiter="__",
     )
 

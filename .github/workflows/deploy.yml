@@ -46,9 +46,9 @@ jobs:
 
       - name: Generate calendars
         env:
-          ITMOSCHEDULE_USERNAME: ${{ secrets.ITMOSCHEDULE_USERNAME }}
-          ITMOSCHEDULE_PASSWORD: ${{ secrets.ITMOSCHEDULE_PASSWORD }}
-          ITMOSCHEDULE_URL_HASH: ${{ secrets.ITMOSCHEDULE_URL_HASH }}
+          ITMO_SYNC_USERNAME: ${{ secrets.ITMO_SYNC_USERNAME }}
+          ITMO_SYNC_PASSWORD: ${{ secrets.ITMO_SYNC_PASSWORD }}
+          ITMO_SYNC_URL_HASH: ${{ secrets.ITMO_SYNC_URL_HASH }}
         run: uv run python src/itmo_sync/main.py
 
       - name: Setup Pages
