@@ -1,7 +1,7 @@
 [project]
 name = "itmo-sync"
 version = "0.1.0"
-description = "Серверлесс-приложение для генерации .ics календаря расписания ИТМО"
+description = "Serverless ITMO University schedule parser and iCalendar exporter. Runs automatically on GitHub Actions with zero hosting required."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
