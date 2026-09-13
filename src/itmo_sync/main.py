@@ -2,7 +2,7 @@ import asyncio
 import sys
 from pathlib import Path
 
-from itmosync.generate import generate_calendars
+from itmo_sync.generate import generate_calendars
 
 
 async def main() -> None:

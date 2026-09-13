@@ -44,7 +44,7 @@ jobs:
           ITMOSCHEDULE_USERNAME: ${{ secrets.ITMOSCHEDULE_USERNAME }}
           ITMOSCHEDULE_PASSWORD: ${{ secrets.ITMOSCHEDULE_PASSWORD }}
           ITMOSCHEDULE_URL_HASH: ${{ secrets.ITMOSCHEDULE_URL_HASH }}
-        run: uv run python src/itmosync/main.py
+        run: uv run python src/itmo_sync/main.py
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

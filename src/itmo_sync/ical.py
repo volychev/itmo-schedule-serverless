@@ -11,7 +11,7 @@ from .settings import settings
 def _init_calendar(name: str, refresh_interval: int = 30) -> Calendar:
     calendar = Calendar()
 
-    calendar.add("prodid", "-//volychev//itmosync//EN")
+    calendar.add("prodid", "-//volychev//itmo-sync//EN")
     calendar.add("version", "2.0")
     calendar.add("x-wr-calname", name)
     calendar.add("x-wr-timezone", "Europe/Moscow")
@@ -27,7 +27,7 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
     identity = f"{lesson.source_type}|{lesson.subject}|{lesson.start.isoformat()}"
 
     event = Event()
-    event.add("uid", f"{uuid5(namespace, identity)}@itmosync")
+    event.add("uid", f"{uuid5(namespace, identity)}@itmo-sync")
     event.add("dtstamp", now)
     event.add("dtstart", lesson.start.astimezone(UTC))
     event.add("dtend", lesson.end.astimezone(UTC))
