@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITMO.Sync</title>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
+        a { color: #0056b3; text-decoration: none; font-weight: 500; }
+        a:hover { text-decoration: underline; }
+        ul { list-style-type: none; padding: 0; }
+        li { background: #f9f9f9; margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .help { font-size: 0.9em; color: #666; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Serverless сервис для расписания ИТМО в формате iCalendar</h1>
+    <p>Твои персональные ссылки для подписки на iCalendar. Скопируй нужные ссылки и добавь их в свой календарь.</p>
+
+    <ul>
+        {% for file in files %}
+        <li>
+            {{ file.emoji }} <strong>{{ file.name }}</strong>:
+            <a href="./{{ file.filename }}">{{ file.filename }}</a>
+            <em>(Занятий: {{ file.count }})</em>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="help">
+        <p><strong>Как подписаться?</strong></p>
+        <p>Не скачивай файл (иначе он не будет обновляться). Скопируй ссылку и вставь её в настройки своего календаря по URL.</p>
+    </div>
+</body>
+</html>

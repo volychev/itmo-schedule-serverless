@@ -1,0 +1,76 @@
+name: Deploy ITMO Schedule
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: uv sync --frozen
+
+      - name: Generate calendars
+        env:
+          # Settings -> Secrets and variables -> Actions -> Secrets
+          ITMOSCHEDULE_USERNAME: "${{ secrets.ITMOSCHEDULE_USERNAME }}"
+          ITMOSCHEDULE_PASSWORD: "${{ secrets.ITMOSCHEDULE_PASSWORD }}"
+          ITMOSCHEDULE_URL_HASH: "${{ secrets.ITMOSCHEDULE_URL_HASH }}"
+
+          # Settings -> Secrets and variables -> Actions -> Variables
+          ITMOSCHEDULE_FETCH_START: "${{ vars.ITMOSCHEDULE_FETCH_START || '09-01' }}"
+          ITMOSCHEDULE_FETCH_END: "${{ vars.ITMOSCHEDULE_FETCH_END || '06-30' }}"
+          ITMOSCHEDULE_REFRESH_INTERVAL: "${{ vars.ITMOSCHEDULE_REFRESH_INTERVAL || '30' }}"
+          ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX: "${{ vars.ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX || 'ИТМО' }}"
+          ITMOSCHEDULE_SUMMARY_TEMPLATE: "${{ vars.ITMOSCHEDULE_SUMMARY_TEMPLATE || '{label} {title} — {type}' }}"
+          ITMOSCHEDULE_DESCRIPTION_TEMPLATE: "${{ vars.ITMOSCHEDULE_DESCRIPTION_TEMPLATE || 'Преподаватель: {teacher}' }}"
+          ITMOSCHEDULE_INCLUDE_LOCATION: "${{ vars.ITMOSCHEDULE_INCLUDE_LOCATION || 'true' }}"
+          ITMOSCHEDULE_INCLUDE_URL_FIELD: "${{ vars.ITMOSCHEDULE_INCLUDE_URL_FIELD || 'true' }}"
+          ITMOSCHEDULE_DEFAULT_LABEL: "${{ vars.ITMOSCHEDULE_DEFAULT_LABEL || '📝' }}"
+          ITMOSCHEDULE_TYPE_NAMES: "${{ vars.ITMOSCHEDULE_TYPE_NAMES || '{\"lecture\": \"Лекция\", \"practical\": \"Практика\", \"lab\": \"Лабораторная\", \"sport\": \"Спорт\", \"externat\": \"Экстернат\", \"exam\": \"Экзамен\", \"credit\": \"Зачет\", \"graded_credit\": \"Диф. зачет\", \"consultation\": \"Консультация\"}' }}"
+          ITMOSCHEDULE_LABELS: "${{ vars.ITMOSCHEDULE_LABELS || '{\"lecture\": \"📚\", \"practical\": \"🧪\", \"lab\": \"🔬\", \"sport\": \"🏋️\", \"externat\": \"🌍\", \"exam\": \"🔥\", \"credit\": \"✅\", \"graded_credit\": \"💯\", \"consultation\": \"💬\"}' }}"
+        run: uv run python src/itmosync/main.py
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './public'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
