@@ -13,4 +13,4 @@ class LessonType(StrEnum):
     EXAM = "Экзамен"
     CREDIT = "Зачет"
     GRADED_CREDIT = "Дифференцированный зачет"
-    CONSULTATION = "Консультация к экзамену"
+    CONSULTATION = "Консультация"

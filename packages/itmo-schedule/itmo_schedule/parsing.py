@@ -31,17 +31,39 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
 
             location_parts = [raw[k] for k in ("room", "building") if raw.get(k)]
 
+            raw_type = raw.get("type", "")
+            raw_type_lower = raw_type.lower()
+
+            if "лекц" in raw_type_lower:
+                stype = LessonType.LECTURE
+            elif "практ" in raw_type_lower:
+                stype = LessonType.PRACTICAL
+            elif "лаб" in raw_type_lower:
+                stype = LessonType.LAB
+            elif "спорт" in raw_type_lower or "физ" in raw_type_lower:
+                stype = LessonType.SPORT
+            elif "экстерн" in raw_type_lower:
+                stype = LessonType.EXTERNAT
+            elif "диф" in raw_type_lower and "зач" in raw_type_lower:
+                stype = LessonType.GRADED_CREDIT
+            elif "зач" in raw_type_lower:
+                stype = LessonType.CREDIT
+            elif "экзам" in raw_type_lower:
+                stype = LessonType.EXAM
+            elif "консульт" in raw_type_lower:
+                stype = LessonType.CONSULTATION
+            else:
+                stype = raw_type.strip()
+
             lesson = Lesson(
-                subject=raw["subject"],
+                subject=raw.get("subject", "Без названия"),
                 start=start,
                 end=end,
-                source_type=raw["type"],
+                source_type=stype,
                 teacher=raw.get("teacher_name") or raw.get("teacher_fio") or None,
                 location=", ".join(location_parts) if location_parts else None,
                 url=raw.get("zoom_url") or None,
             )
-
-            stype = lesson.source_type
 
             if stype == LessonType.LECTURE:
                 lectures.append(lesson)
