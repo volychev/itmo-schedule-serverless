@@ -8,17 +8,13 @@ from itmo_schedule import Lesson, LessonType
 from .settings import settings
 
 
-def _init_calendar(name: str, refresh_interval: int = 30) -> Calendar:
+def _init_calendar(name: str) -> Calendar:
     calendar = Calendar()
 
     calendar.add("prodid", "-//volychev//itmo-sync//EN")
     calendar.add("version", "2.0")
     calendar.add("x-wr-calname", name)
     calendar.add("x-wr-timezone", "Europe/Moscow")
-
-    refresh_duration: str = f"PT{refresh_interval}M"
-    calendar.add("x-published-ttl", refresh_duration)                   # Apple
-    calendar.add("refresh-interval;value=duration", refresh_duration)   # Google / Outlook
 
     return calendar
 

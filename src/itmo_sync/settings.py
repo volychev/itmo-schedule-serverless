@@ -36,12 +36,6 @@ class Settings(BaseSettings):
         description="Месяц и день конца парсинга в формате ММ-ДД",
     )
 
-    refresh_interval: int = Field(
-        default=30,
-        ge=1,
-        description="Интервал автообновления календаря в минутах",
-    )
-
     default_calendar_prefix: str = Field(
         default="ИТМО",
         description="Префикс для названия календарей, который будет отображаться в приложении",
