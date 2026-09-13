@@ -9,46 +9,93 @@
         a { color: #0056b3; text-decoration: none; font-weight: 500; }
         a:hover { text-decoration: underline; }
         ul { list-style-type: none; padding: 0; }
-        li { background: #f9f9f9; margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
-        .help { font-size: 0.9em; color: #666; margin-top: 20px; }
+        li { background: #f9f9f9; margin-bottom: 10px; padding: 15px; border-radius: 8px; border: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+        .schedule-info { flex-grow: 1; }
+        .help-container { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
+        .help { font-size: 0.9em; color: #666; margin-bottom: 15px; background: #fdfdfd; padding: 12px; border-radius: 6px; border: 1px solid #f0f0f0; }
+        .help strong { display: block; margin-bottom: 5px; color: #444; }
+        .copy-btn { background: #0056b3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9em; transition: background 0.2s; white-space: nowrap; }
+        .copy-btn:hover { background: #004494; }
+        .copy-btn.copied { background: #28a745; }
+        details { margin-bottom: 20px; }
+        details summary { cursor: pointer; font-weight: 600; margin-bottom: 15px; padding: 12px 15px; background: #f1f1f1; border-radius: 8px; user-select: none; }
+        details summary:hover { background: #e9e9e9; }
+        .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; font-size: 0.85em; color: #888; }
+        .footer p { margin: 5px 0; }
+        .footer a { color: #666; }
+        .footer a:hover { color: #0056b3; }
     </style>
 </head>
 <body>
     <h1>Расписание ИТМО</h1>
     <p>Твои персональные ссылки для подписки на iCalendar. Скопируй нужные ссылки и добавь их в свой календарь.</p>
+    
     <p style="background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
         <strong>📅 Период:</strong> с {{ start_date }} по {{ end_date }}<br>
         <strong>🔄 Последнее обновление:</strong> {{ last_updated }}
     </p>
 
-    <ul>
-        {% for file in files %}
-        <li>
-            {{ file.emoji }} <strong>{{ file.name }}</strong>:
-            <a href="./{{ file.filename }}">{{ file.filename }}</a>
-            <em>(Занятий: {{ file.count }})</em>
-        </li>
-        {% endfor %}
-    </ul>
+    <details open>
+        <summary>Расписания для подписки</summary>
+        <ul>
+            {% for file in files %}
+            <li>
+                <div class="schedule-info">
+                    {{ file.emoji }} <strong>{{ file.name }}</strong>:
+                    <a href="./{{ file.filename }}">{{ file.filename }}</a>
+                    <br>
+                    <em style="font-size: 0.85em; color: #666;">(Занятий: {{ file.count }})</em>
+                </div>
+                <button class="copy-btn" data-file="{{ file.filename }}">Скопировать ссылку</button>
+            </li>
+            {% endfor %}
+        </ul>
+    </details>
 
-    <div class="help">
-        <p><strong>Как подписаться?</strong></p>
-        <p>Не скачивай файл (иначе он не будет обновляться). Скопируй ссылку и вставь её в настройки своего календаря по URL.</p>
+    <div class="help-container">
+        <h3 style="margin-bottom: 15px; font-size: 1.1em; color: #444;">Частые вопросы</h3>
+        <div class="help">
+            <strong>Как подписаться?</strong>
+            Не скачивай файл (иначе он не будет обновляться). Скопируй ссылку и вставь её в настройки своего календаря по URL.
+        </div>
+
+        <div class="help">
+            <strong>Нужны ли мне все ссылки?</strong>
+            Нет! Ты можешь подписаться только на те календари, которые тебе нужны. Либо выбрать общее расписание general, которое содержит все занятия.
+        </div>
+
+        <div class="help">
+            <strong>Как часто обновляется расписание?</strong>
+            Зависит от того, как ты настроил планировщик в репозитории. По умолчанию, расписание обновляется раз в 6 часов. Подробнее в README.
+        </div>
+
+        <div class="help">
+            <strong>Мне не нравится содержание/наполнение/формат событий в календаре. Как мне изменить это?</strong>
+            Ты можешь гибко настроить формат событий в репозитории. Подробнее в README.
+        </div>
     </div>
 
-    <div class="help">
-        <p><strong>Нужны ли мне все ссылки?</strong></p>
-        <p>Нет! Ты можешь подписаться только на те календари, которые тебе нужны. Либо выбрать общее расписание general, которое содержит все занятия.</p>
+    <div class="footer">
+        <p>ITMO.Sync v2 | <a href="https://github.com/volychev/itmo-schedule-serverless" target="_blank" rel="noopener noreferrer">Исходный код на GitHub</a></p>
+        <p>Разработчик: <a href="https://telegram.me/volychev" target="_blank" rel="noopener noreferrer">@volychev</a></p>
     </div>
 
-    <div class="help">
-        <p><strong>Как часто обновляется расписание?</strong></p>
-        <p>Зависит от того, как ты настроил планировщик в репозитории. По умолчанию, расписание обновляется раз в 6 часов. Подробнее в README.</p>
-    </div>
-
-    <div class="help">
-        <p><strong>Мне не нравится содержание/наполнение/формат событий в календаре. Как мне изменить это?</strong></p>
-        <p>Ты можешь гибко настроить формат событий в репозитории. Подробнее в README.</p>
-    </div>
+    <script>
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filename = btn.getAttribute('data-file');
+                const url = new URL(filename, window.location.href).href;
+                navigator.clipboard.writeText(url).then(() => {
+                    const originalText = btn.innerText;
+                    btn.innerText = 'Скопировано!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
