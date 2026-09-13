@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from .enums import LessonType
+from .enums import LessonType, WorkTypeId
 from .models import Lesson, Schedule
 
 
@@ -33,8 +33,23 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
 
             raw_type = raw.get("type", "")
             raw_type_lower = raw_type.lower()
+            work_type_id = raw.get("work_type_id")
 
-            if "лекц" in raw_type_lower:
+            if work_type_id == WorkTypeId.LECTURE:
+                stype = LessonType.LECTURE
+            elif work_type_id == WorkTypeId.LAB:
+                stype = LessonType.LAB
+            elif work_type_id == WorkTypeId.PRACTICAL:
+                stype = LessonType.PRACTICAL
+            elif work_type_id == WorkTypeId.EXAM:
+                stype = LessonType.EXAM
+            elif work_type_id == WorkTypeId.CREDIT:
+                stype = LessonType.CREDIT
+            elif work_type_id == WorkTypeId.CONSULTATION:
+                stype = LessonType.CONSULTATION
+            elif work_type_id == WorkTypeId.SPORT:
+                stype = LessonType.SPORT
+            elif "лекц" in raw_type_lower:
                 stype = LessonType.LECTURE
             elif "практ" in raw_type_lower:
                 stype = LessonType.PRACTICAL
@@ -60,6 +75,10 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
                 start=start,
                 end=end,
                 source_type=stype,
+                work_type_id=work_type_id,
+                flow_type_id=raw.get("flow_type_id"),
+                format_id=raw.get("format_id"),
+                note=raw.get("note"),
                 teacher=raw.get("teacher_name") or raw.get("teacher_fio") or None,
                 location=", ".join(location_parts) if location_parts else None,
                 url=raw.get("zoom_url") or None,

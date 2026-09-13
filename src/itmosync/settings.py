@@ -1,4 +1,4 @@
-from itmo_schedule import LessonType
+from itmo_schedule import FormatId, LessonType
 from pydantic import Field, SecretStr
 from pydantic_settings import (
     BaseSettings,
@@ -48,14 +48,14 @@ class Settings(BaseSettings):
     )
 
     summary_template: str = Field(
-        default="{label} {title} — {type}",
+        default="{label} {title} — {type}. {format}",
         min_length=1,
-        description="Шаблон названия события (доступны: {label} (эмодзи), {title}, {type}, {teachers}, {location}, {url})",
+        description="Шаблон названия события (доступны: {label} (эмодзи), {title}, {type}, {teacher}, {location}, {url}, {format}, {note})",
     )
 
     description_template: str = Field(
-        default="Преподаватель: {teacher}",
-        description="Шаблон подробного описания события (поддерживает многострочный текст)",
+        default="Преподаватель: {teacher}\n\n{note}",
+        description="Шаблон подробного описания события (поддерживает многострочный текст), (доступны: {label} (эмодзи), {title}, {type}, {teacher}, {location}, {url}, {format}, {note})",
     )
 
     include_location: bool = Field(
@@ -96,6 +96,15 @@ class Settings(BaseSettings):
             LessonType.CONSULTATION: "💬",    # Консультация к экзамену
         },
         description="Маппинг типов пар в эмодзи-метки",
+    )
+
+    format_labels: dict[int, str] = Field(
+        default={
+            FormatId.IN_PERSON: "Очно",
+            FormatId.HYBRID: "Смешанный формат",
+            FormatId.REMOTE: "Дистанционно",
+        },
+        description="Маппинг форматов проведения (id) в текст с эмодзи",
     )
 
     default_label: str = Field(

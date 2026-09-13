@@ -39,6 +39,8 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
         "teacher": lesson.teacher or "Не указан",
         "location": lesson.location or "Не указано",
         "url": lesson.url or "Не указана",
+        "format": settings.format_labels.get(lesson.format_id, ""),
+        "note": lesson.note or "",
     }
 
     summary = settings.summary_template.format(**context).strip()

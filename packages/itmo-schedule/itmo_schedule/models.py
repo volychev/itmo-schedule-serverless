@@ -8,6 +8,10 @@ class Lesson:
     start: datetime
     end: datetime
     source_type: str
+    work_type_id: int
+    flow_type_id: int
+    format_id: int
+    note: str | None = None
     teacher: str | None = None
     location: str | None = None
     url: str | None = None
