@@ -1,11 +1,11 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from itmo_schedule import get_schedule
+from itmo_schedule import get_schedule, Lesson, LessonType, FormatId
 
 from .ical import render_calendar
 from .page import render_index
-from .settings import settings
+from .settings import settings, MatchRule, RenameRule
 
 
 def _resolve_dates(start_mm_dd: str, end_mm_dd: str) -> tuple[datetime, datetime]:
@@ -28,6 +28,43 @@ def _resolve_dates(start_mm_dd: str, end_mm_dd: str) -> tuple[datetime, datetime
     return start, end
 
 
+def _matches_rule(lesson: Lesson, rule: MatchRule | str) -> bool:
+    if isinstance(rule, str):
+        return lesson.subject == rule
+    
+    if rule.match != lesson.subject:
+        return False
+        
+    if rule.type is not None:
+        expected_type = rule.type.value if isinstance(rule.type, LessonType) else rule.type
+        if isinstance(expected_type, str):
+            try:
+                expected_type = LessonType[expected_type].value
+            except KeyError:
+                pass
+        
+        if lesson.source_type != expected_type:
+            return False
+            
+    if rule.format is not None:
+        expected_format = rule.format
+        if isinstance(expected_format, str):
+            try:
+                expected_format = FormatId[expected_format]
+            except KeyError:
+                pass
+
+        if isinstance(expected_format, FormatId):
+            if lesson.format_id != expected_format.value:
+                return False
+        else:
+            lesson_format = settings.format_labels.get(lesson.format_id, "")
+            if lesson_format != expected_format:
+                return False
+            
+    return True
+
+
 async def generate_calendars(base_output_dir: Path) -> None:
     start_date, end_date = _resolve_dates(settings.fetch_start, settings.fetch_end)
     username = settings.username.get_secret_value()
@@ -44,21 +81,46 @@ async def generate_calendars(base_output_dir: Path) -> None:
     output_dir = base_output_dir / settings.url_hash.get_secret_value()
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    filtered_lectures = schedule.lectures
+    filtered_practicals = schedule.practicals_and_labs
+    filtered_sports = schedule.sports
+    filtered_exams = schedule.exams
+    filtered_bookings = schedule.bookings
+    filtered_unclassified = schedule.unclassified
+
+    if settings.ignore:
+        def should_keep(lesson: Lesson) -> bool:
+            return not any(_matches_rule(lesson, rule) for rule in settings.ignore)
+
+        filtered_lectures = tuple(l for l in schedule.lectures if should_keep(l))
+        filtered_practicals = tuple(l for l in schedule.practicals_and_labs if should_keep(l))
+        filtered_sports = tuple(l for l in schedule.sports if should_keep(l))
+        filtered_exams = tuple(l for l in schedule.exams if should_keep(l))
+        filtered_bookings = tuple(l for l in schedule.bookings if should_keep(l))
+        filtered_unclassified = tuple(l for l in schedule.unclassified if should_keep(l))
+
+    if settings.renames:
+        for group in (filtered_lectures, filtered_practicals, filtered_sports, filtered_exams, filtered_bookings, filtered_unclassified):
+            for lesson in group:
+                for rule in settings.renames:
+                    if _matches_rule(lesson, rule):
+                        lesson.subject = rule.to
+
     categories = {
         "general": (
-            schedule.lectures
-            + schedule.practicals_and_labs
-            + schedule.sports
-            + schedule.exams
-            + schedule.bookings
-            + schedule.unclassified
+            filtered_lectures
+            + filtered_practicals
+            + filtered_sports
+            + filtered_exams
+            + filtered_bookings
+            + filtered_unclassified
         ),
-        "lectures": schedule.lectures,
-        "practicals": schedule.practicals_and_labs,
-        "sports": schedule.sports,
-        "exams": schedule.exams,
-        "bookings": schedule.bookings,
-        "unclassified": schedule.unclassified,
+        "lectures": filtered_lectures,
+        "practicals": filtered_practicals,
+        "sports": filtered_sports,
+        "exams": filtered_exams,
+        "bookings": filtered_bookings,
+        "unclassified": filtered_unclassified,
     }
 
     print(f"Total lessons (general): {len(categories['general'])}. Generating files...")

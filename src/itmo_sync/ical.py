@@ -28,11 +28,14 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
     event.add("dtstart", lesson.start.astimezone(UTC))
     event.add("dtend", lesson.end.astimezone(UTC))
 
+    source_type_key = lesson.source_type.name if isinstance(lesson.source_type, LessonType) else lesson.source_type
+
     context = {
         "title": lesson.subject,
-        "type": settings.type_names.get(lesson.source_type, lesson.source_type),
-        "label": settings.labels.get(lesson.source_type, settings.default_label),
+        "type": settings.type_names.get(source_type_key, lesson.source_type),
+        "label": settings.labels.get(source_type_key, settings.default_label),
         "teacher": lesson.teacher or "Не указан",
+        "teacher_short": _get_teacher_short(lesson.teacher),
         "location": lesson.location or "Не указано",
         "url": lesson.url or "Не указана",
         "format": settings.format_labels.get(lesson.format_id, ""),
@@ -64,7 +67,21 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
     return event
 
 
-def render_calendar(lessons: Iterable[Lesson], name: str) -> bytes:
+def _get_teacher_short(full_name: str | None) -> str:
+    if not full_name:
+        return "Не указан"
+
+    parts = full_name.strip().split()
+
+    if len(parts) >= 3:
+        return f"{parts[0]} {parts[1][0]}. {parts[2][0]}."
+    elif len(parts) == 2:
+        return f"{parts[0]} {parts[1][0]}."
+
+    return full_name
+
+
+def render_calendar(lessons: Iterable[Lesson], name: str = "ИТМО") -> bytes:
     calendar = _init_calendar(name)
     now = datetime.now(UTC)
 

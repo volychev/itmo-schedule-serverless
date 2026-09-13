@@ -1,11 +1,30 @@
 from itmo_schedule import FormatId, LessonType
-from pydantic import Field, SecretStr
+from pydantic import BaseModel, Field, SecretStr, model_validator
+from typing import Any
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
     SettingsConfigDict,
     YamlConfigSettingsSource,
 )
+
+class MatchRule(BaseModel):
+    match: str
+    type: LessonType | str | None = None
+    format: str | None = None
+
+
+class RenameRule(MatchRule):
+    to: str
+
+    @model_validator(mode='before')
+    @classmethod
+    def convert_dict(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if 'match' not in data and len(data) == 1:
+                k, v = next(iter(data.items()))
+                return {'match': k, 'to': v}
+        return data
 
 
 class Settings(BaseSettings):
@@ -75,32 +94,42 @@ class Settings(BaseSettings):
 
     type_names: dict[str, str] = Field(
         default={
-            LessonType.LECTURE: "Лекция",             # Лекции
-            LessonType.PRACTICAL: "Практика",         # Практические занятия
-            LessonType.LAB: "Лабораторная",           # Лабораторные занятия
-            LessonType.SPORT: "Спорт",                # Занятия спортом
-            LessonType.EXTERNAT: "Экстернат",         # Экстернат
-            LessonType.EXAM: "Экзамен",               # Экзамен
-            LessonType.CREDIT: "Зачет",               # Зачет
-            LessonType.GRADED_CREDIT: "Диф. зачет",   # Дифференцированный зачет
-            LessonType.CONSULTATION: "Консультация",  # Консультация к экзамену
-            LessonType.BOOKING: "Бронирование",       # Бронирования аудиторий
+            LessonType.LECTURE.name: "Лекция",             # Лекции
+            LessonType.PRACTICAL.name: "Практика",         # Практические занятия
+            LessonType.LAB.name: "Лабораторная",           # Лабораторные занятия
+            LessonType.SPORT.name: "Спорт",                # Занятия спортом
+            LessonType.EXTERNAT.name: "Экстернат",         # Экстернат
+            LessonType.EXAM.name: "Экзамен",               # Экзамен
+            LessonType.CREDIT.name: "Зачет",               # Зачет
+            LessonType.GRADED_CREDIT.name: "Диф. зачет",   # Дифференцированный зачет
+            LessonType.CONSULTATION.name: "Консультация",  # Консультация к экзамену
+            LessonType.BOOKING.name: "Бронирование",       # Бронирования аудиторий
         },
         description="Маппинг системных типов пар в сокращенные названия",
     )
 
+    ignore: list[MatchRule | str] = Field(
+        default_factory=list,
+        description="Правила для полного исключения предметов из календаря",
+    )
+
+    renames: list[RenameRule] = Field(
+        default_factory=list,
+        description="Правила для переименования предметов",
+    )
+
     labels: dict[str, str] = Field(
         default={
-            LessonType.LECTURE: "📚",         # Лекции
-            LessonType.PRACTICAL: "🧪",       # Практические занятия
-            LessonType.LAB: "🔬",             # Лабораторные занятия
-            LessonType.SPORT: "🏋️",           # Занятия спортом
-            LessonType.EXTERNAT: "🌍",        # Экстернат
-            LessonType.EXAM: "🔥",            # Экзамен
-            LessonType.CREDIT: "✅",          # Зачет
-            LessonType.GRADED_CREDIT: "💯",   # Дифференцированный зачет
-            LessonType.CONSULTATION: "💬",    # Консультация к экзамену
-            LessonType.BOOKING: "🗓️",         # Бронирования аудиторий
+            LessonType.LECTURE.name: "📚",         # Лекции
+            LessonType.PRACTICAL.name: "🧪",       # Практические занятия
+            LessonType.LAB.name: "🔬",             # Лабораторные занятия
+            LessonType.SPORT.name: "🏋️",           # Занятия спортом
+            LessonType.EXTERNAT.name: "🌍",        # Экстернат
+            LessonType.EXAM.name: "🔥",            # Экзамен
+            LessonType.CREDIT.name: "✅",          # Зачет
+            LessonType.GRADED_CREDIT.name: "💯",   # Дифференцированный зачет
+            LessonType.CONSULTATION.name: "💬",    # Консультация к экзамену
+            LessonType.BOOKING.name: "🗓️",         # Бронирования аудиторий
         },
         description="Маппинг типов пар в эмодзи-метки",
     )
