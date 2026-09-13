@@ -35,25 +35,15 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
+      - name: Inject GitHub Variables into Environment
+        run: |
+          echo '${{ toJson(vars) }}' | jq -r 'to_entries[] | select(.value != "") | "\(.key)=\(.value)"' >> $GITHUB_ENV
+
       - name: Generate calendars
         env:
-          # Settings -> Secrets and variables -> Actions -> Secrets
-          ITMOSCHEDULE_USERNAME: "${{ secrets.ITMOSCHEDULE_USERNAME }}"
-          ITMOSCHEDULE_PASSWORD: "${{ secrets.ITMOSCHEDULE_PASSWORD }}"
-          ITMOSCHEDULE_URL_HASH: "${{ secrets.ITMOSCHEDULE_URL_HASH }}"
-
-          # Settings -> Secrets and variables -> Actions -> Variables
-          ITMOSCHEDULE_FETCH_START: "${{ vars.ITMOSCHEDULE_FETCH_START }}"
-          ITMOSCHEDULE_FETCH_END: "${{ vars.ITMOSCHEDULE_FETCH_END }}"
-          ITMOSCHEDULE_REFRESH_INTERVAL: "${{ vars.ITMOSCHEDULE_REFRESH_INTERVAL }}"
-          ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX: "${{ vars.ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX }}"
-          ITMOSCHEDULE_SUMMARY_TEMPLATE: "${{ vars.ITMOSCHEDULE_SUMMARY_TEMPLATE }}"
-          ITMOSCHEDULE_DESCRIPTION_TEMPLATE: "${{ vars.ITMOSCHEDULE_DESCRIPTION_TEMPLATE }}"
-          ITMOSCHEDULE_INCLUDE_LOCATION: "${{ vars.ITMOSCHEDULE_INCLUDE_LOCATION }}"
-          ITMOSCHEDULE_INCLUDE_URL_FIELD: "${{ vars.ITMOSCHEDULE_INCLUDE_URL_FIELD }}"
-          ITMOSCHEDULE_DEFAULT_LABEL: "${{ vars.ITMOSCHEDULE_DEFAULT_LABEL }}"
-          ITMOSCHEDULE_TYPE_NAMES: "${{ vars.ITMOSCHEDULE_TYPE_NAMES }}"
-          ITMOSCHEDULE_LABELS: "${{ vars.ITMOSCHEDULE_LABELS }}"
+          ITMOSCHEDULE_USERNAME: ${{ secrets.ITMOSCHEDULE_USERNAME }}
+          ITMOSCHEDULE_PASSWORD: ${{ secrets.ITMOSCHEDULE_PASSWORD }}
+          ITMOSCHEDULE_URL_HASH: ${{ secrets.ITMOSCHEDULE_URL_HASH }}
         run: uv run python src/itmosync/main.py
 
       - name: Setup Pages
