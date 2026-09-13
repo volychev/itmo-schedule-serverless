@@ -77,7 +77,12 @@ async def generate_calendars(base_output_dir: Path) -> None:
             "emoji": "📚" if category_name == "general" else "📅"
         })
 
-    html_content = render_index(file_info)
+    html_content = render_index(
+        file_info=file_info,
+        start_date=start_date.strftime("%d.%m.%Y"),
+        end_date=end_date.strftime("%d.%m.%Y"),
+        last_updated=datetime.now(UTC).strftime("%d.%m.%Y %H:%M UTC"),
+    )
     (output_dir / "index.html").write_text(html_content, encoding="utf-8")
 
     print(f"✅ Calendars and index.html successfully saved to {output_dir}")

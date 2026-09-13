@@ -16,6 +16,10 @@
 <body>
     <h1>Расписание ИТМО</h1>
     <p>Твои персональные ссылки для подписки на iCalendar. Скопируй нужные ссылки и добавь их в свой календарь.</p>
+    <p style="background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+        <strong>📅 Период:</strong> с {{ start_date }} по {{ end_date }}<br>
+        <strong>🔄 Последнее обновление:</strong> {{ last_updated }}
+    </p>
 
     <ul>
         {% for file in files %}
