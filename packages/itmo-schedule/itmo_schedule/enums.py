@@ -33,6 +33,6 @@ class FlowTypeId(IntEnum):
 
 
 class FormatId(IntEnum):
-    IN_PERSON = 1
-    HYBRID = 2
+    IN_PERSON = 2
+    HYBRID = 1
     REMOTE = 3
