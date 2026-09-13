@@ -6,7 +6,7 @@ import html
 import json
 import re
 import secrets
-from datetime import date
+from datetime import datetime
 from urllib.parse import parse_qs, urljoin, urlsplit
 
 import httpx
@@ -88,7 +88,7 @@ async def _login(http: httpx.AsyncClient, username: str, password: str) -> str:
 
 
 async def get_schedule(
-    username: str, password: str, start: date, end: date
+    username: str, password: str, start: datetime, end: datetime
 ) -> Schedule:
     """Log in and return classes in [start, end)."""
     if not username.strip() or not password:
@@ -98,15 +98,19 @@ async def get_schedule(
         token = await _login(http, username, password)
         response = await http.get(
             "https://my.itmo.ru/api/schedule/schedule/personal",
-            params={"date_start": start.isoformat(), "date_end": end.isoformat()},
+            params={"date_start": start.strftime("%Y-%m-%d"), "date_end": end.strftime("%Y-%m-%d")},
             headers={"Authorization": f"Bearer {token}"},
         )
         response.raise_for_status()
         payload = response.json()
+
+        start_str = start.strftime("%Y-%m-%d")
+        end_str = end.strftime("%Y-%m-%d")
+
         payload["data"] = [
             day
             for day in payload["data"]
-            if start <= date.fromisoformat(day["date"]) < end
+            if start_str <= day["date"][:10] < end_str
         ]
 
         return (await parse_schedule(payload))
