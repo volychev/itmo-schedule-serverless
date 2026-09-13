@@ -2,7 +2,7 @@ name: Sync & Deploy ITMO Schedule
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '47 * * * *'
   workflow_dispatch:
 
 permissions:
