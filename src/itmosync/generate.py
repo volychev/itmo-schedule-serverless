@@ -3,8 +3,8 @@ from pathlib import Path
 
 from itmo_schedule import get_schedule
 
-from .html import render_index
 from .ical import render_calendar
+from .page import render_index
 from .settings import settings
 
 
