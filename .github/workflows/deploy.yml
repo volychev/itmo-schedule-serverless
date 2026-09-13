@@ -1,4 +1,4 @@
-name: Deploy ITMO Schedule
+name: Sync & Deploy ITMO Schedule
 
 on:
   schedule:
@@ -43,17 +43,17 @@ jobs:
           ITMOSCHEDULE_URL_HASH: "${{ secrets.ITMOSCHEDULE_URL_HASH }}"
 
           # Settings -> Secrets and variables -> Actions -> Variables
-          ITMOSCHEDULE_FETCH_START: "${{ vars.ITMOSCHEDULE_FETCH_START || '09-01' }}"
-          ITMOSCHEDULE_FETCH_END: "${{ vars.ITMOSCHEDULE_FETCH_END || '06-30' }}"
-          ITMOSCHEDULE_REFRESH_INTERVAL: "${{ vars.ITMOSCHEDULE_REFRESH_INTERVAL || '30' }}"
-          ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX: "${{ vars.ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX || 'ИТМО' }}"
-          ITMOSCHEDULE_SUMMARY_TEMPLATE: "${{ vars.ITMOSCHEDULE_SUMMARY_TEMPLATE || '{label} {title} — {type}' }}"
-          ITMOSCHEDULE_DESCRIPTION_TEMPLATE: "${{ vars.ITMOSCHEDULE_DESCRIPTION_TEMPLATE || 'Преподаватель: {teacher}' }}"
-          ITMOSCHEDULE_INCLUDE_LOCATION: "${{ vars.ITMOSCHEDULE_INCLUDE_LOCATION || 'true' }}"
-          ITMOSCHEDULE_INCLUDE_URL_FIELD: "${{ vars.ITMOSCHEDULE_INCLUDE_URL_FIELD || 'true' }}"
-          ITMOSCHEDULE_DEFAULT_LABEL: "${{ vars.ITMOSCHEDULE_DEFAULT_LABEL || '📝' }}"
-          ITMOSCHEDULE_TYPE_NAMES: "${{ vars.ITMOSCHEDULE_TYPE_NAMES || '{\"lecture\": \"Лекция\", \"practical\": \"Практика\", \"lab\": \"Лабораторная\", \"sport\": \"Спорт\", \"externat\": \"Экстернат\", \"exam\": \"Экзамен\", \"credit\": \"Зачет\", \"graded_credit\": \"Диф. зачет\", \"consultation\": \"Консультация\"}' }}"
-          ITMOSCHEDULE_LABELS: "${{ vars.ITMOSCHEDULE_LABELS || '{\"lecture\": \"📚\", \"practical\": \"🧪\", \"lab\": \"🔬\", \"sport\": \"🏋️\", \"externat\": \"🌍\", \"exam\": \"🔥\", \"credit\": \"✅\", \"graded_credit\": \"💯\", \"consultation\": \"💬\"}' }}"
+          ITMOSCHEDULE_FETCH_START: "${{ vars.ITMOSCHEDULE_FETCH_START }}"
+          ITMOSCHEDULE_FETCH_END: "${{ vars.ITMOSCHEDULE_FETCH_END }}"
+          ITMOSCHEDULE_REFRESH_INTERVAL: "${{ vars.ITMOSCHEDULE_REFRESH_INTERVAL }}"
+          ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX: "${{ vars.ITMOSCHEDULE_DEFAULT_CALENDAR_PREFIX }}"
+          ITMOSCHEDULE_SUMMARY_TEMPLATE: "${{ vars.ITMOSCHEDULE_SUMMARY_TEMPLATE }}"
+          ITMOSCHEDULE_DESCRIPTION_TEMPLATE: "${{ vars.ITMOSCHEDULE_DESCRIPTION_TEMPLATE }}"
+          ITMOSCHEDULE_INCLUDE_LOCATION: "${{ vars.ITMOSCHEDULE_INCLUDE_LOCATION }}"
+          ITMOSCHEDULE_INCLUDE_URL_FIELD: "${{ vars.ITMOSCHEDULE_INCLUDE_URL_FIELD }}"
+          ITMOSCHEDULE_DEFAULT_LABEL: "${{ vars.ITMOSCHEDULE_DEFAULT_LABEL }}"
+          ITMOSCHEDULE_TYPE_NAMES: "${{ vars.ITMOSCHEDULE_TYPE_NAMES }}"
+          ITMOSCHEDULE_LABELS: "${{ vars.ITMOSCHEDULE_LABELS }}"
         run: uv run python src/itmosync/main.py
 
       - name: Setup Pages

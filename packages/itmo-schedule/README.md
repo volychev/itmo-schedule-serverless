@@ -16,7 +16,7 @@ async def main():
     username = input("ISU: ")
     password = getpass("Password: ")
     schedule = await get_schedule(
-        username, password, date(2026, 9, 5), date(2026, 9, 13)
+        username, password, datetime(2026, 9, 11), datetime(2026, 9, 13)
     )
 
     for lesson in schedule.lectures:
