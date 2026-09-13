@@ -13,7 +13,10 @@ class LessonType(StrEnum):
     EXAM = "Экзамен"
     CREDIT = "Зачет"
     GRADED_CREDIT = "Дифференцированный зачет"
+
     CONSULTATION = "Консультация"
+
+    BOOKING = "Бронирования"
 
 
 class WorkTypeId(IntEnum):

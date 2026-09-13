@@ -3,7 +3,7 @@ from datetime import UTC, datetime
 from uuid import NAMESPACE_URL, UUID, uuid5
 
 from icalendar import Calendar, Event
-from itmo_schedule import Lesson
+from itmo_schedule import Lesson, LessonType
 
 from .settings import settings
 
@@ -43,10 +43,17 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
         "note": lesson.note or "",
     }
 
-    summary = settings.summary_template.format(**context).strip()
+    if lesson.source_type == LessonType.BOOKING:
+        summary_tpl = settings.booking_summary_template
+        desc_tpl = settings.booking_description_template
+    else:
+        summary_tpl = settings.summary_template
+        desc_tpl = settings.description_template
+
+    summary = summary_tpl.format(**context).strip()
     event.add("summary", summary)
 
-    raw_description = settings.description_template.format(**context)
+    raw_description = desc_tpl.format(**context)
     description = "\n".join(line for line in raw_description.splitlines() if line.strip())
 
     if description:

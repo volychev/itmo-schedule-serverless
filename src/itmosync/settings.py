@@ -54,8 +54,19 @@ class Settings(BaseSettings):
     )
 
     description_template: str = Field(
-        default="Преподаватель: {teacher}\n\n{note}",
-        description="Шаблон подробного описания события (поддерживает многострочный текст), (доступны: {label} (эмодзи), {title}, {type}, {teacher}, {location}, {url}, {format}, {note})",
+        default="Преподаватель: {teacher}\n{format}\n{note}",
+        description="Шаблон подробного описания события (поддерживает многострочный текст)",
+    )
+
+    booking_summary_template: str = Field(
+        default="{label} Бронирование: {title}",
+        min_length=1,
+        description="Шаблон названия события для бронирований",
+    )
+
+    booking_description_template: str = Field(
+        default="{format}\n\n{note}",
+        description="Шаблон подробного описания события для бронирований",
     )
 
     include_location: bool = Field(
@@ -79,6 +90,7 @@ class Settings(BaseSettings):
             LessonType.CREDIT: "Зачет",               # Зачет
             LessonType.GRADED_CREDIT: "Диф. зачет",   # Дифференцированный зачет
             LessonType.CONSULTATION: "Консультация",  # Консультация к экзамену
+            LessonType.BOOKING: "Бронирование",       # Бронирования аудиторий
         },
         description="Маппинг системных типов пар в сокращенные названия",
     )
@@ -94,6 +106,7 @@ class Settings(BaseSettings):
             LessonType.CREDIT: "✅",          # Зачет
             LessonType.GRADED_CREDIT: "💯",   # Дифференцированный зачет
             LessonType.CONSULTATION: "💬",    # Консультация к экзамену
+            LessonType.BOOKING: "🗓️",         # Бронирования аудиторий
         },
         description="Маппинг типов пар в эмодзи-метки",
     )

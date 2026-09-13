@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from .enums import LessonType, WorkTypeId
+from .enums import FlowTypeId, LessonType, WorkTypeId
 from .models import Lesson, Schedule
 
 
@@ -17,6 +17,7 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
     practicals_and_labs = []
     sports = []
     exams = []
+    bookings = []
     unclassified = []
 
     for day in payload.get("data", []):
@@ -34,8 +35,11 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
             raw_type = raw.get("type", "")
             raw_type_lower = raw_type.lower()
             work_type_id = raw.get("work_type_id")
+            flow_type_id = raw.get("flow_type_id")
 
-            if work_type_id == WorkTypeId.LECTURE:
+            if flow_type_id == FlowTypeId.BOOKING:
+                stype = LessonType.BOOKING
+            elif work_type_id == WorkTypeId.LECTURE:
                 stype = LessonType.LECTURE
             elif work_type_id == WorkTypeId.LAB:
                 stype = LessonType.LAB
@@ -92,6 +96,8 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
                 sports.append(lesson)
             elif stype in (LessonType.EXAM, LessonType.CREDIT, LessonType.GRADED_CREDIT, LessonType.CONSULTATION):
                 exams.append(lesson)
+            elif stype == LessonType.BOOKING:
+                bookings.append(lesson)
             else:
                 unclassified.append(lesson)
 
@@ -104,5 +110,6 @@ async def parse_schedule(payload: dict[str, Any]) -> Schedule:
         practicals_and_labs=tuple(sorted(practicals_and_labs, key=sort_key)),
         sports=tuple(sorted(sports, key=sort_key)),
         exams=tuple(sorted(exams, key=sort_key)),
+        bookings=tuple(sorted(bookings, key=sort_key)),
         unclassified=tuple(sorted(unclassified, key=sort_key)),
     )

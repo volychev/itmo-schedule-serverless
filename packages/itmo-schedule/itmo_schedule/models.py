@@ -23,4 +23,5 @@ class Schedule:
     practicals_and_labs: tuple[Lesson, ...] = ()
     sports: tuple[Lesson, ...] = ()
     exams: tuple[Lesson, ...] = ()
+    bookings: tuple[Lesson, ...] = ()
     unclassified: tuple[Lesson, ...] = ()

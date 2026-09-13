@@ -50,12 +50,14 @@ async def generate_calendars(base_output_dir: Path) -> None:
             + schedule.practicals_and_labs
             + schedule.sports
             + schedule.exams
+            + schedule.bookings
             + schedule.unclassified
         ),
         "lectures": schedule.lectures,
         "practicals": schedule.practicals_and_labs,
         "sports": schedule.sports,
         "exams": schedule.exams,
+        "bookings": schedule.bookings,
         "unclassified": schedule.unclassified,
     }
 
