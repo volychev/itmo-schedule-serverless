@@ -1,8 +1,13 @@
 name: Sync & Deploy ITMO Schedule
 
 on:
+  push:
+    branches:
+      - main
+
   schedule:
-    - cron: '47 * * * *'
+    - cron: '51 * * * *'
+
   workflow_dispatch:
 
 permissions:
