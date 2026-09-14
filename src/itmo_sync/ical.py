@@ -5,7 +5,7 @@ from uuid import NAMESPACE_URL, UUID, uuid5
 from icalendar import Calendar, Event
 from itmo_schedule import Lesson, LessonType
 
-from .settings import settings
+from .config import config
 
 
 def _init_calendar(name: str) -> Calendar:
@@ -32,22 +32,22 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
 
     context = {
         "title": lesson.subject,
-        "type": settings.type_names.get(source_type_key, lesson.source_type),
-        "label": settings.labels.get(source_type_key, settings.default_label),
+        "type": config.appearance.type_names.get(source_type_key, lesson.source_type),
+        "label": config.appearance.labels.get(source_type_key, config.appearance.default_label),
         "teacher": lesson.teacher or "Не указан",
         "teacher_short": _get_teacher_short(lesson.teacher),
         "location": lesson.location or "Не указано",
         "url": lesson.url or "Не указана",
-        "format": settings.format_labels.get(lesson.format_id, ""),
+        "format": config.appearance.format_labels.get(lesson.format_id, ""),
         "note": lesson.note or "",
     }
 
     if lesson.source_type == LessonType.BOOKING:
-        summary_tpl = settings.booking_summary_template
-        desc_tpl = settings.booking_description_template
+        summary_tpl = config.templates.bookings.summary
+        desc_tpl = config.templates.bookings.description
     else:
-        summary_tpl = settings.summary_template
-        desc_tpl = settings.description_template
+        summary_tpl = config.templates.events.summary
+        desc_tpl = config.templates.events.description
 
     summary = summary_tpl.format(**context).strip()
     event.add("summary", summary)
@@ -58,10 +58,10 @@ def _create_event(lesson: Lesson, now: datetime, namespace: UUID) -> Event:
     if description:
         event.add("description", description)
 
-    if settings.include_location and lesson.location:
+    if config.system.include_location and lesson.location:
         event.add("location", lesson.location)
 
-    if settings.include_url_field and lesson.url:
+    if config.system.include_url and lesson.url:
         event.add("url", lesson.url)
 
     return event

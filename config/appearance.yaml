@@ -1,0 +1,29 @@
+appearance:
+  type_names:
+    LECTURE: "Лекция"
+    PRACTICAL: "Практика"
+    LAB: "Лабораторная"
+    SPORT: "Спорт"
+    EXTERNAT: "Экстернат"
+    EXAM: "Экзамен"
+    TEST_WITH_GRADE: "Диф. зачет"
+    TEST: "Зачет"
+    CONSULTATION: "Консультация"
+    BOOKING: "Бронирование"
+
+  labels:
+    LECTURE: "📚"
+    PRACTICAL: "🛠️"
+    LAB: "🔬"
+    SPORT: "🏃"
+    EXTERNAT: "🎓"
+    EXAM: "🔥"
+    TEST_WITH_GRADE: "✨"
+    TEST: "⭐"
+    CONSULTATION: "🗣️"
+    BOOKING: "🗓️"
+
+  format_labels:
+    2: "Очно"
+    1: "Смешанный формат"
+    3: "Дистанционно"

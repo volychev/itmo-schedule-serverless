@@ -1,0 +1,6 @@
+system:
+  fetch_start: "09-01"
+  fetch_end: "06-30"
+  default_calendar_prefix: "ИТМО"
+  include_location: true
+  include_url: true

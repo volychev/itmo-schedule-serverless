@@ -1,11 +1,11 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-from itmo_schedule import get_schedule, Lesson, LessonType, FormatId
+from itmo_schedule import FormatId, Lesson, LessonType, get_schedule
 
+from .config import MatchRule, RenameRule, config
 from .ical import render_calendar
 from .page import render_index
-from .settings import settings, MatchRule, RenameRule
 
 
 def _resolve_dates(start_mm_dd: str, end_mm_dd: str) -> tuple[datetime, datetime]:
@@ -58,7 +58,7 @@ def _matches_rule(lesson: Lesson, rule: MatchRule | str) -> bool:
             if lesson.format_id != expected_format.value:
                 return False
         else:
-            lesson_format = settings.format_labels.get(lesson.format_id, "")
+            lesson_format = config.appearance.format_labels.get(lesson.format_id, "")
             if lesson_format != expected_format:
                 return False
             
@@ -66,19 +66,19 @@ def _matches_rule(lesson: Lesson, rule: MatchRule | str) -> bool:
 
 
 async def generate_calendars(base_output_dir: Path) -> None:
-    start_date, end_date = _resolve_dates(settings.fetch_start, settings.fetch_end)
-    username = settings.username.get_secret_value()
+    start_date, end_date = _resolve_dates(config.system.fetch_start, config.system.fetch_end)
+    username = config.username.get_secret_value()
 
     print(f"Fetching schedule from {start_date} to {end_date}...")
 
     schedule = await get_schedule(
         username=username,
-        password=settings.password.get_secret_value(),
+        password=config.password.get_secret_value(),
         start=start_date,
         end=end_date,
     )
 
-    output_dir = base_output_dir / settings.url_hash.get_secret_value()
+    output_dir = base_output_dir / config.url_hash.get_secret_value()
     output_dir.mkdir(parents=True, exist_ok=True)
 
     filtered_lectures = schedule.lectures
@@ -88,9 +88,9 @@ async def generate_calendars(base_output_dir: Path) -> None:
     filtered_bookings = schedule.bookings
     filtered_unclassified = schedule.unclassified
 
-    if settings.ignore:
+    if config.rules.ignore:
         def should_keep(lesson: Lesson) -> bool:
-            return not any(_matches_rule(lesson, rule) for rule in settings.ignore)
+            return not any(_matches_rule(lesson, rule) for rule in config.rules.ignore)
 
         filtered_lectures = tuple(l for l in schedule.lectures if should_keep(l))
         filtered_practicals = tuple(l for l in schedule.practicals_and_labs if should_keep(l))
@@ -99,10 +99,10 @@ async def generate_calendars(base_output_dir: Path) -> None:
         filtered_bookings = tuple(l for l in schedule.bookings if should_keep(l))
         filtered_unclassified = tuple(l for l in schedule.unclassified if should_keep(l))
 
-    if settings.renames:
+    if config.rules.renames:
         for group in (filtered_lectures, filtered_practicals, filtered_sports, filtered_exams, filtered_bookings, filtered_unclassified):
             for lesson in group:
-                for rule in settings.renames:
+                for rule in config.rules.renames:
                     if _matches_rule(lesson, rule):
                         lesson.subject = rule.to
 
@@ -128,7 +128,7 @@ async def generate_calendars(base_output_dir: Path) -> None:
     file_info = []
 
     for category_name, lessons in categories.items():
-        ical_data = render_calendar(lessons, name=f"{settings.default_calendar_prefix}: {category_name.capitalize()}")
+        ical_data = render_calendar(lessons, name=f"{config.system.default_calendar_prefix}: {category_name.capitalize()}")
 
         file_name = f"{category_name}.ics"
         file_path = output_dir / file_name
