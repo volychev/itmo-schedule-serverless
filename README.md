@@ -64,7 +64,7 @@
 
 
 ## 💗 Благодарности:
-- Спасибо [Timofey Smolyankin](https://github.com/madfanat) за идею, подтолкнувшую на создание этого проекта.
+- Спасибо [@madfanat *(Timofey Smolyankin)*](https://github.com/madfanat) за идею, подтолкнувшую на создание этого проекта.
 - Основа внутренней библиотеки для работы с API ИТМО (`itmo_schedule`) взята из проекта [madfanat/itmom](https://github.com/madfanat/itmom).
 
 
